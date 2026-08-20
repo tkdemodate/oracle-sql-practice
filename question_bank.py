@@ -33,8 +33,8 @@ QUESTION_BANK = [
         'answer_sql': 'SELECT ename, sal FROM emp WHERE sal > 2000',
         'answer': None, 'options': None,
         'explanation': (
-            '① 结果 6 行:JONES 2975、BLAKE 2850、CLARK 2450、'
-            'SCOTT 3000、KING 5000、FORD 3000。\n'
+            '① 结果 6 行:刘洋 2975、杨丽 2850、赵明 2450、'
+            '周强 3000、吴伟 5000、马超 3000。\n'
             '② 语法:WHERE 后写过滤条件,支持 > < >= <= = <> 等比较运算符。\n'
             '③ 易错点:判断相等是一个 =(不是 ==);不等号写 <> 或 !=。'
         ),
@@ -47,7 +47,7 @@ QUESTION_BANK = [
         'answer_sql': 'SELECT ename, job FROM emp WHERE deptno = 10',
         'answer': None, 'options': None,
         'explanation': (
-            '① 结果 3 行:CLARK(MANAGER)、KING(PRESIDENT)、MILLER(CLERK)。\n'
+            '① 结果 3 行:赵明(经理)、吴伟(总裁)、朱琳(职员)。\n'
             '② 语法:数值与日期直接比较,不加引号;字符串才用单引号。\n'
             '③ 易错点:Oracle 中字符串只能用单引号,双引号是标识符(列名)的写法。'
         ),
@@ -60,7 +60,7 @@ QUESTION_BANK = [
         'answer_sql': 'SELECT ename, sal FROM emp ORDER BY sal DESC',
         'answer': None, 'options': None,
         'explanation': (
-            '① 结果 14 行,第一行是 KING(5000),SCOTT 与 FORD 并列 3000。\n'
+            '① 结果 14 行,第一行是 吴伟(5000),周强 与 马超 并列 3000。\n'
             '② 语法:ORDER BY 列 DESC 降序,ASC 升序(默认,可省略)。\n'
             '③ 易错点:ORDER BY 是 SQL 执行的最后一步,放在 WHERE/GROUP BY 之后;'
             'Oracle 中 NULL 升序排最后、降序排最前。'
@@ -103,7 +103,7 @@ QUESTION_BANK = [
         'answer_sql': 'SELECT DISTINCT job FROM emp',
         'answer': None, 'options': None,
         'explanation': (
-            '① 结果 5 行:CLERK、SALESMAN、PRESIDENT、MANAGER、ANALYST。\n'
+            '① 结果 5 行:职员、销售员、总裁、经理、分析师。\n'
             '② 语法:DISTINCT 放在 SELECT 之后、第一个列名之前。\n'
             '③ 易错点:DISTINCT 作用于其后「所有列的组合」——'
             'SELECT DISTINCT job, deptno 是对两列组合去重,不是只对 job 去重。'
@@ -111,17 +111,19 @@ QUESTION_BANK = [
     },
     {
         'id': 8, 'difficulty': '初级', 'topic': '模糊查询', 'type': 'sql',
-        'title': '姓名以 S 开头',
-        'question': '查询姓名以字母 S 开头的员工姓名。',
-        'hint': "LIKE 'S%'",
-        'answer_sql': "SELECT ename FROM emp WHERE ename LIKE 'S%'",
+        'title': '姓张或姓周',
+        'question': '查询姓张或姓周的员工姓名。',
+        'hint': "ename LIKE '张%' OR ename LIKE '周%'",
+        'answer_sql': ("SELECT ename FROM emp "
+                       "WHERE ename LIKE '张%' OR ename LIKE '周%'"),
         'answer': None, 'options': None,
         'explanation': (
-            '① 结果 2 行:SMITH、SCOTT。\n'
+            '① 结果 2 行:张伟、周强。\n'
             '② 语法:LIKE 模糊匹配,% 匹配任意多个字符(含 0 个),'
             '_ 匹配单个字符。\n'
-            '③ 易错点:LIKE 默认区分大小写,"s%" 匹配不到 SMITH;'
-            '匹配内容里的 % _ 本身要用 ESCAPE 转义。'
+            '③ 易错点:LIKE 是前缀/包含匹配,不是等于比较;'
+            '要精确等于某个姓必须 LIKE "张%"(以张开头)。'
+            '中文 LIKE 严格区分中文字符,不会模糊简化。'
         ),
     },
     {
@@ -133,8 +135,8 @@ QUESTION_BANK = [
                        'WHERE sal BETWEEN 1500 AND 3000'),
         'answer': None, 'options': None,
         'explanation': (
-            '① 结果 7 行:ALLEN 1600、TURNER 1500、JONES 2975、BLAKE 2850、'
-            'CLARK 2450、SCOTT 3000、FORD 3000。\n'
+            '① 结果 7 行:李娜 1600、郑华 1500、刘洋 2975、杨丽 2850、'
+            '赵明 2450、周强 3000、马超 3000。\n'
             '② 语法:BETWEEN a AND b 是闭区间 [a, b],'
             '等价于 sal >= 1500 AND sal <= 3000。\n'
             '③ 易错点:BETWEEN 必须「小值在前大值在后」;'
@@ -149,7 +151,7 @@ QUESTION_BANK = [
         'answer_sql': 'SELECT ename FROM emp WHERE comm IS NULL',
         'answer': None, 'options': None,
         'explanation': (
-            '① 结果 10 行:除 4 名销售员(ALLEN/WARD/MARTIN/TURNER)外的所有员工。\n'
+            '① 结果 10 行:除 4 名销售员(李娜/王芳/陈刚/郑华)外的所有员工。\n'
             '② 语法:NULL 的判断只能用 IS NULL / IS NOT NULL。\n'
             '③ 易错点:comm = NULL 永远查不出结果——NULL 与任何值比较都返回「未知」,'
             '这是 SQL 最高频的面试坑。'
@@ -157,14 +159,14 @@ QUESTION_BANK = [
     },
     {
         'id': 11, 'difficulty': '初级', 'topic': '条件查询', 'type': 'sql',
-        'title': 'MANAGER 或 ANALYST',
-        'question': "查询岗位为 MANAGER 或 ANALYST 的员工姓名、岗位和工资。",
-        'hint': "IN ('MANAGER', 'ANALYST')",
+        'title': '经理 或 分析师',
+        'question': "查询岗位为 经理 或 分析师 的员工姓名、岗位和工资。",
+        'hint': "IN ('经理', '分析师')",
         'answer_sql': ("SELECT ename, job, sal FROM emp "
-                       "WHERE job IN ('MANAGER', 'ANALYST')"),
+                       "WHERE job IN ('经理', '分析师')"),
         'answer': None, 'options': None,
         'explanation': (
-            '① 结果 5 行:JONES、BLAKE、CLARK(MANAGER),SCOTT、FORD(ANALYST)。\n'
+            '① 结果 5 行:刘洋、杨丽、赵明(经理),周强、马超(分析师)。\n'
             '② 语法:IN (值列表) 等价于多个 OR 条件的简写。\n'
             '③ 易错点:IN 里的字符串要加单引号;NOT IN 遇到列表/子查询含 NULL 时'
             '会一条也查不出来,是著名陷阱。'
@@ -172,16 +174,16 @@ QUESTION_BANK = [
     },
     {
         'id': 12, 'difficulty': '初级', 'topic': '模糊查询', 'type': 'sql',
-        'title': '姓名中含字母 A',
-        'question': '查询姓名中包含字母 A 的员工姓名。',
-        'hint': "LIKE '%A%'",
-        'answer_sql': "SELECT ename FROM emp WHERE ename LIKE '%A%'",
+        'title': '姓名含"伟"字',
+        'question': '查询姓名中含有"伟"字的员工姓名。',
+        'hint': "LIKE '%伟%'",
+        'answer_sql': "SELECT ename FROM emp WHERE ename LIKE '%伟%'",
         'answer': None, 'options': None,
         'explanation': (
-            '① 结果 7 行:ALLEN、WARD、MARTIN、BLAKE、CLARK、ADAMS、JAMES。\n'
-            "② 语法:'%A%' 中 % 在两侧表示 A 出现在任意位置都匹配。\n"
-            "③ 易错点:区分大小写,'A' 匹配不到小写 a;"
-            "如需不区分大小写可用 UPPER(ename) LIKE '%A%'。"
+            '① 结果 2 行:张伟、吴伟。\n'
+            "② 语法:'%伟%' 中两个 % 表示「伟」字可出现在任意位置都匹配。\n"
+            '③ 易错点:中文字符严格匹配,"伟"不会匹配到形近字;'
+            "若要搜多字可写 LIKE '%伟%' OR ename LIKE '%强%'。"
         ),
     },
     # ---------------- 中级 14 题 ----------------
@@ -194,7 +196,7 @@ QUESTION_BANK = [
                        'JOIN dept d ON e.deptno = d.deptno'),
         'answer': None, 'options': None,
         'explanation': (
-            '① 结果 14 行:40 号部门 OPERATIONS 没有员工,内连接不会出现。\n'
+            '① 结果 14 行:40 号部门 运营部 没有员工,内连接不会出现。\n'
             '② 语法:JOIN ... ON 是标准内连接写法,ON 后写两表的关联条件。\n'
             '③ 易错点:忘记写 ON 会变成笛卡尔积(14 × 4 = 56 行);'
             '表别名 e、d 让列引用更清晰。'
@@ -212,7 +214,7 @@ QUESTION_BANK = [
             '① 结果仍是 14 行:所有员工都有部门,所以与内连接相同。\n'
             '② 语法:LEFT JOIN 以左表为主,右表无匹配的行补 NULL。\n'
             '③ 考点:若反过来写 FROM dept d LEFT JOIN emp e,'
-            '会得到 15 行,多出 OPERATIONS 一行(ename 为 NULL)——'
+            '会得到 15 行,多出 运营部 一行(ename 为 NULL)——'
             '理解连接方向是本题的关键。'
         ),
     },
@@ -225,8 +227,8 @@ QUESTION_BANK = [
                        'WHERE sal > (SELECT AVG(sal) FROM emp)'),
         'answer': None, 'options': None,
         'explanation': (
-            '① 全公司平均工资约 2073.21,结果 6 行:JONES、BLAKE、CLARK、'
-            'SCOTT、KING、FORD。\n'
+            '① 全公司平均工资约 2073.21,结果 6 行:刘洋、杨丽、赵明、'
+            '周强、吴伟、马超。\n'
             '② 语法:子查询先独立执行算出平均值,再作为外层的比较值;'
             '也可用 WITH 子句(CTE)先算后用。\n'
             '③ 易错点:单行子查询只能配单行比较符;'
@@ -243,7 +245,7 @@ QUESTION_BANK = [
                        'WHERE deptno = e.deptno)'),
         'answer': None, 'options': None,
         'explanation': (
-            '① 结果 6 行:KING(10)、JONES、SCOTT、FORD(20)、ALLEN、BLAKE(30)。\n'
+            '① 结果 6 行:吴伟(10)、刘洋、周强、马超(20)、李娜、杨丽(30)。\n'
             '② 语法:相关子查询——内层引用外层的 e.deptno,'
             '外层每行都重新计算一次本部门平均。「超过本组平均」是经典模板。\n'
             '③ 易错点:别忘了内层写 deptno = e.deptno;'
@@ -276,10 +278,10 @@ QUESTION_BANK = [
                        'LEFT JOIN emp m ON e.mgr = m.empno'),
         'answer': None, 'options': None,
         'explanation': (
-            '① 结果 14 行,KING 的上级显示 NULL(他是总裁,没有上级)。\n'
+            '① 结果 14 行,吴伟 的上级显示 NULL(他是总裁,没有上级)。\n'
             '② 语法:自连接——同一张表取两个别名 e(员工视角)、m(上级视角), '
             '连接条件 e.mgr = m.empno。\n'
-            '③ 易错点:若用内连接会丢掉 KING 这一行(MGR 为 NULL 匹配不上),'
+            '③ 易错点:若用内连接会丢掉 吴伟 这一行(MGR 为 NULL 匹配不上),'
             '所以必须 LEFT JOIN。'
         ),
     },
@@ -293,7 +295,7 @@ QUESTION_BANK = [
                        'WHERE ROWNUM <= 3'),
         'answer': None, 'options': None,
         'explanation': (
-            '① 结果 3 行:KING 5000、SCOTT 3000、FORD 3000。\n'
+            '① 结果 3 行:吴伟 5000、周强 3000、马超 3000。\n'
             '② 语法:Oracle 经典 Top-N——先在子查询内排序, '
             '外层用 ROWNUM <= n 截取(本程序自动转换为 LIMIT)。\n'
             '③ 易错点:直接写 WHERE ROWNUM <= 3 再 ORDER BY 是错的——'
@@ -309,7 +311,7 @@ QUESTION_BANK = [
                        '(SELECT 1 FROM emp e WHERE e.deptno = d.deptno)'),
         'answer': None, 'options': None,
         'explanation': (
-            '① 结果 3 行:ACCOUNTING、RESEARCH、SALES(OPERATIONS 无员工)。\n'
+            '① 结果 3 行:财务部、研发部、销售部(运营部 无员工)。\n'
             '② 语法:EXISTS 只关心子查询「是否有行返回」,找到一行即短路返回, '
             '大数据量下通常比 IN 高效。\n'
             '③ 等价写法:SELECT dname FROM dept WHERE deptno IN '
@@ -319,15 +321,15 @@ QUESTION_BANK = [
     {
         'id': 21, 'difficulty': '中级', 'topic': '集合', 'type': 'sql',
         'title': 'UNION 合并去重',
-        'question': '查询「工资大于 2500」或「岗位是 CLERK」的员工姓名'
+        'question': '查询「工资大于 2500」或「岗位是 职员」的员工姓名'
                     '(用 UNION 合并两个查询)。',
         'hint': '两个 SELECT 用 UNION 连接',
         'answer_sql': ("SELECT ename FROM emp WHERE sal > 2500 "
-                       "UNION SELECT ename FROM emp WHERE job = 'CLERK'"),
+                       "UNION SELECT ename FROM emp WHERE job = '职员'"),
         'answer': None, 'options': None,
         'explanation': (
-            '① 结果 9 行:高薪 5 人(JONES/BLAKE/SCOTT/KING/FORD)'
-            '+ 职员 4 人(SMITH/JAMES/ADAMS/MILLER),无重叠。\n'
+            '① 结果 9 行:高薪 5 人(刘洋/杨丽/周强/吴伟/马超)'
+            '+ 职员 4 人(张伟/钱莉/孙杰/朱琳),无重叠。\n'
             '② 语法:UNION 合并并去重;UNION ALL 不去重、更快;'
             '交集用 INTERSECT,差集用 MINUS。\n'
             '③ 易错点:UNION 两侧列数与类型必须一致;'
@@ -344,7 +346,7 @@ QUESTION_BANK = [
                        'JOIN salgrade s ON e.sal BETWEEN s.losal AND s.hisal'),
         'answer': None, 'options': None,
         'explanation': (
-            '① 结果 14 行:如 SMITH 800 → 1 级,KING 5000 → 5 级。\n'
+            '① 结果 14 行:如 张伟 800 → 1 级,吴伟 5000 → 5 级。\n'
             '② 语法:非等值连接——ON 条件不是等号而是 BETWEEN 范围匹配, '
             'SALGRADE 表就是为这种练习设计的。\n'
             '③ 易错点:区间边界重叠会导致一行匹配多个等级(笛卡尔式膨胀), '
@@ -369,17 +371,17 @@ QUESTION_BANK = [
     },
     {
         'id': 24, 'difficulty': '中级', 'topic': '子查询', 'type': 'sql',
-        'title': '与 SCOTT 同部门的人',
-        'question': "查询与 SCOTT 同一部门的所有员工姓名(子查询实现)。",
-        'hint': "子查询先求出 SCOTT 的 deptno",
+        'title': '与 周强 同部门的人',
+        'question': "查询与 周强 同一部门的所有员工姓名(子查询实现)。",
+        'hint': "子查询先求出 周强 的 deptno",
         'answer_sql': ("SELECT ename FROM emp WHERE deptno = "
-                       "(SELECT deptno FROM emp WHERE ename = 'SCOTT')"),
+                       "(SELECT deptno FROM emp WHERE ename = '周强')"),
         'answer': None, 'options': None,
         'explanation': (
-            '① 结果 5 行:SMITH、JONES、SCOTT、ADAMS、FORD(都是 20 号部门)。\n'
-            '② 语法:子查询返回 SCOTT 的部门号 20,外层做等值过滤。\n'
-            '③ 易错点:结果包含 SCOTT 本人;若要排除自己, '
-            "加 AND ename <> 'SCOTT'。"
+            '① 结果 5 行:张伟、刘洋、周强、孙杰、马超(都是 20 号部门)。\n'
+            '② 语法:子查询返回 周强 的部门号 20,外层做等值过滤。\n'
+            '③ 易错点:结果包含 周强 本人;若要排除自己, '
+            "加 AND ename <> '周强'。"
         ),
     },
     {
@@ -390,7 +392,7 @@ QUESTION_BANK = [
         'answer_sql': 'SELECT LOWER(ename), SUBSTR(ename, 1, 3) FROM emp',
         'answer': None, 'options': None,
         'explanation': (
-            '① 结果 14 行:如 SMITH → smith / smi。\n'
+            '① 结果 14 行:如 张伟 → smith / smi。\n'
             '② 语法:LOWER 转小写;SUBSTR(串, 起点, 长度) 起点从 1 开始, '
             '不是 0。\n'
             '③ 易错点:Oracle 下标从 1 起,写 SUBSTR(ename, 0, 3) 也会被当作 1 '
@@ -408,8 +410,8 @@ QUESTION_BANK = [
                        "AND hiredate < '1982-01-01'"),
         'answer': None, 'options': None,
         'explanation': (
-            '① 结果 10 行:ALLEN、WARD、JONES、MARTIN、BLAKE、CLARK、KING、'
-            'TURNER、JAMES、FORD(SMITH 是 1980、MILLER 1982、SCOTT/ADAMS 1987)。\n'
+            '① 结果 10 行:李娜、王芳、刘洋、陈刚、杨丽、赵明、吴伟、'
+            '郑华、钱莉、马超(张伟 是 1980、朱琳 1982、周强/孙杰 1987)。\n'
             '② 语法:「左闭右开」写法 >= 起点 AND < 终点,不用纠结年末边界, '
             '是日期范围查询的最佳实践。\n'
             "③ 易错点:TO_CHAR(hiredate, 'YYYY') = '1981' 也能实现, "
@@ -426,7 +428,7 @@ QUESTION_BANK = [
         'answer': None, 'options': None,
         'explanation': (
             '① 结果 14 行,10 个无奖金者显示 0,4 名销售显示实际奖金'
-            '(TURNER 的奖金本身就是 0)。\n'
+            '(郑华 的奖金本身就是 0)。\n'
             '② 语法:NVL(x, y):x 为 NULL 取 y,否则取 x; '
             '近亲 NVL2(x, a, b) 是「非空取 a 否则取 b」。\n'
             '③ 易错点:comm + 100 在 comm 为 NULL 时整体是 NULL, '
@@ -436,13 +438,13 @@ QUESTION_BANK = [
     {
         'id': 28, 'difficulty': '高级', 'topic': 'Oracle 函数', 'type': 'sql',
         'title': 'DECODE 岗位翻译',
-        'question': '用 DECODE 把岗位翻译成中文:MANAGER→经理、SALESMAN→销售、'
-                    'CLERK→职员、ANALYST→分析师、PRESIDENT→总裁,'
+        'question': '用 DECODE 把岗位翻译成中文:经理→经理、销售员→销售、'
+                    '职员→职员、分析师→分析师、总裁→总裁,'
                     '其他岗位显示「其他」。',
-        'hint': "DECODE(job, 'MANAGER', '经理', ..., '其他')",
-        'answer_sql': ("SELECT ename, DECODE(job, 'MANAGER', '经理', "
-                       "'SALESMAN', '销售', 'CLERK', '职员', "
-                       "'ANALYST', '分析师', 'PRESIDENT', '总裁', '其他') "
+        'hint': "DECODE(job, '经理', '经理', ..., '其他')",
+        'answer_sql': ("SELECT ename, DECODE(job, '经理', '经理', "
+                       "'销售员', '销售', '职员', '职员', "
+                       "'分析师', '分析师', '总裁', '总裁', '其他') "
                        "FROM emp"),
         'answer': None, 'options': None,
         'explanation': (
@@ -451,7 +453,7 @@ QUESTION_BANK = [
             '② 语法:DECODE(列, 值1, 译1, 值2, 译2, ..., 默认值) '
             '逐对匹配,是多个 CASE WHEN 的简写,Oracle 面试必考。\n'
             '③ 易错点:DECODE 认为 NULL 与 NULL 相等(与普通比较不同); '
-            "标准写法 CASE job WHEN 'MANAGER' THEN '经理' ... ELSE '其他' END "
+            "标准写法 CASE job WHEN '经理' THEN '经理' ... ELSE '其他' END "
             '更通用。'
         ),
     },
@@ -464,7 +466,7 @@ QUESTION_BANK = [
                        "FROM emp"),
         'answer': None, 'options': None,
         'explanation': (
-            '① 结果 14 行:如 SMITH → 1980年12月、KING → 1981年11月。\n'
+            '① 结果 14 行:如 张伟 → 1980年12月、吴伟 → 1981年11月。\n'
             '② 语法:TO_CHAR(日期, 格式) 把日期转字符串, '
             '常用占位符:YYYY 年、MM 月、DD 日、HH24 时、MI 分、SS 秒; '
             '格式串里的中文等非占位符字符会原样保留。\n'
@@ -483,8 +485,8 @@ QUESTION_BANK = [
                        'ORDER BY sal DESC) FROM emp'),
         'answer': None, 'options': None,
         'explanation': (
-            '① 结果 14 行:每个部门独立排名,如 20 号部门 SCOTT/FORD 并列第 1、'
-            'JONES 第 3。\n'
+            '① 结果 14 行:每个部门独立排名,如 20 号部门 周强/马超 并列第 1、'
+            '刘洋 第 3。\n'
             '② 语法:RANK() OVER (PARTITION BY 分区列 ORDER BY 排序列) '
             '先按部门分区、区内按工资降序排名;分析函数不减少行数, '
             '这是与 GROUP BY 最大的区别。\n'
@@ -503,7 +505,7 @@ QUESTION_BANK = [
         'answer': None, 'options': None,
         'explanation': (
             '① 结果 14 行:按 sal 升序逐行累加,最后一行累计 29025(工资总额);'
-            '相同工资的行(SCOTT/FORD)会一起累加。\n'
+            '相同工资的行(周强/马超)会一起累加。\n'
             '② 语法:SUM(...) OVER (ORDER BY ...) 形成累计窗口; '
             'OVER() 里不写 ORDER BY 则每行都是全表总计。\n'
             '③ 易错点:OVER 的默认窗口是 RANGE(相同值一起算), '
@@ -521,8 +523,8 @@ QUESTION_BANK = [
                        'WHERE rn BETWEEN 4 AND 6'),
         'answer': None, 'options': None,
         'explanation': (
-            '① 结果 3 行:JONES 2975、BLAKE 2850、CLARK 2450。'
-            '(前 3 名是 KING 5000、SCOTT 3000、FORD 3000。)\n'
+            '① 结果 3 行:刘洋 2975、杨丽 2850、赵明 2450。'
+            '(前 3 名是 吴伟 5000、周强 3000、马超 3000。)\n'
             '② 语法:ROW_NUMBER() OVER (ORDER BY ...) 生成连续序号, '
             '外层用 rn BETWEEN 过滤区间,这是 Oracle 12c 之前的通用分页方案。\n'
             '③ 易错点:分析函数不能直接写在 WHERE 里(执行顺序在 WHERE 之后), '
@@ -540,7 +542,7 @@ QUESTION_BANK = [
                        "FROM emp"),
         'answer': None, 'options': None,
         'explanation': (
-            '① 结果 14 行:司龄最长 SMITH 约 48.5 个月,最短 ADAMS 约 -20.3 个月'
+            '① 结果 14 行:司龄最长 张伟 约 48.5 个月,最短 孙杰 约 -20.3 个月'
             '(1987 年入职,晚于基准日,为负)。\n'
             '② 语法:MONTHS_BETWEEN(d1, d2) 返回 d1-d2 的月数差,可含小数'
             '(按天折算 /31);ROUND(n, d) 四舍五入保留 d 位小数。\n'
@@ -558,7 +560,7 @@ QUESTION_BANK = [
                        'JOIN emp e ON d.deptno = e.deptno'),
         'answer': None, 'options': None,
         'explanation': (
-            '① 结果 1 行:OPERATIONS(40 号部门无人)。\n'
+            '① 结果 1 行:运营部(40 号部门无人)。\n'
             '② 语法:MINUS 取第一个结果集减去第二个结果集(自动去重), '
             'Oracle 特有;本程序已自动转换为 SQLite 的 EXCEPT。\n'
             '③ 易错点:MINUS 前后两个查询的列数/类型要一致; '
@@ -568,7 +570,7 @@ QUESTION_BANK = [
     {
         'id': 35, 'difficulty': '高级', 'topic': '层次查询', 'type': 'choice',
         'title': 'CONNECT BY 层次查询',
-        'question': ('在 Oracle 中,要从 KING 开始查询整棵「员工→上级」汇报树, '
+        'question': ('在 Oracle 中,要从 吴伟 开始查询整棵「员工→上级」汇报树, '
                      '正确的层次查询写法是?'),
         'hint': None,
         'answer_sql': None,
@@ -583,7 +585,7 @@ QUESTION_BANK = [
         'explanation': (
             '正确答案 B:层次查询固定句式为 '
             'START WITH <树根条件> CONNECT BY PRIOR <父列=子列>。'
-            'START WITH mgr IS NULL 定位 KING(没有上级),'
+            'START WITH mgr IS NULL 定位 吴伟(没有上级),'
             'PRIOR empno = mgr 表示「父节点的 empno = 子节点的 mgr」,自顶向下遍历。\n'
             '其他选项错误:A 中 GROUP BY 不是层次查询关键字;'
             'C 中 ORDER BY 不能与 CONNECT BY 混用(保序要用 ORDER SIBLINGS BY);'

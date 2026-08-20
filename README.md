@@ -126,7 +126,7 @@ oracle-sql-trainer/
 
 ---
 
-## 🗃 示例数据(SCOTT 经典演示账户)
+## 🗃 示例数据(SCOTT 经典演示账户·中文化)
 
 | 表 | 行数 | 列 |
 |---|---|---|
@@ -135,7 +135,18 @@ oracle-sql-trainer/
 | **SALGRADE** | 5 | GRADE / LOSAL / HISAL |
 | **DUAL** | 1 | DUMMY |
 
-经典员工:SMITH / ALLEN / WARD / JONES / MARTIN / BLAKE / CLARK / SCOTT / KING / TURNER / ADAMS / JAMES / FORD / MILLER。
+**部门**(4 个):
+
+| DEPTNO | 部门名 | 所在地 |
+|---|---|---|
+| 10 | 财务部 | 北京 |
+| 20 | 研发部 | 上海 |
+| 30 | 销售部 | 广州 |
+| 40 | 运营部 | 深圳 |
+
+**岗位**(5 种):职员、销售员、经理、分析师、总裁
+
+**员工**(14 人):张伟、李娜、王芳、刘洋、陈刚、杨丽、赵明、周强、吴伟、郑华、孙杰、钱莉、马超、朱琳
 
 ---
 
