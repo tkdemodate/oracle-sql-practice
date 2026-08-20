@@ -7,14 +7,80 @@
 """
 
 import re
+import os
+import json
 import random
+import datetime
 import tkinter as tk
 from tkinter import ttk, messagebox
 
 from db_engine import OracleEngine
 from question_bank import QUESTION_BANK, by_difficulty, get_question
-from oracle_practice import (record_answer, load_progress, load_wrongbook,
-                             fmt_val, DATA_DIR)
+
+# ----- 数据持久化(原 oracle_practice.py 提供,现内联) -----
+DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
+os.makedirs(DATA_DIR, exist_ok=True)
+_PROGRESS_FILE = os.path.join(DATA_DIR, 'progress.json')
+_WRONGBOOK_FILE = os.path.join(DATA_DIR, 'wrongbook.json')
+
+
+def fmt_val(v):
+    """把值转成表格友好的字符串"""
+    if v is None:
+        return 'NULL'
+    if isinstance(v, float) and v.is_integer():
+        return str(int(v))
+    if isinstance(v, (datetime.datetime, datetime.date)):
+        return v.strftime('%Y-%m-%d')
+    return str(v)
+
+
+def _load_json(path, default):
+    try:
+        with open(path, encoding='utf-8') as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return default
+
+
+def _save_json(path, obj):
+    with open(path, 'w', encoding='utf-8') as f:
+        json.dump(obj, f, ensure_ascii=False, indent=2)
+
+
+def load_progress():
+    return _load_json(_PROGRESS_FILE, {
+        'answered': 0, 'correct': 0, 'by_difficulty': {}})
+
+
+def load_wrongbook():
+    return _load_json(_WRONGBOOK_FILE, {'items': {}})
+
+
+def record_answer(q, ok):
+    """记录一次答题,更新 progress.json 和 wrongbook.json"""
+    prog = load_progress()
+    prog['answered'] = prog.get('answered', 0) + 1
+    if ok:
+        prog['correct'] = prog.get('correct', 0) + 1
+    diff = q.get('difficulty', '未知')
+    bd = prog.setdefault('by_difficulty', {}).setdefault(diff,
+        {'answered': 0, 'correct': 0})
+    bd['answered'] += 1
+    if ok:
+        bd['correct'] += 1
+    _save_json(_PROGRESS_FILE, prog)
+
+    wb = load_wrongbook()
+    qid = str(q.get('id'))
+    if not ok:
+        wb.setdefault('items', {})[qid] = {
+            'id': qid, 'title': q.get('title', ''),
+            'difficulty': diff, 'topic': q.get('topic', ''),
+            'last_wrong_at': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+    else:
+        wb.get('items', {}).pop(qid, None)
+    _save_json(_WRONGBOOK_FILE, wb)
 
 TEXT_FONT = ('Microsoft YaHei UI', 10)
 META_FONT = ('Microsoft YaHei UI', 10, 'bold')
