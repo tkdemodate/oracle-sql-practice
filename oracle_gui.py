@@ -712,6 +712,21 @@ class WrongFrame(ttk.Frame):
                              q['title'], q['topic'], items[key]))
         render_rows(self.tree, ['题号', '难度', '标题', '主题', '已错次数'],
                     rows)
+        # 自动装载第一道错题到答题卡(避免页面打开后用户无法作答)
+        if rows and (self.card.q is None
+                     or str(self.card.q.get('id')) not in items):
+            q = get_question(rows[0][0])
+            if q:
+                self.card.set_question(q)
+                set_feedback(self.feedback,
+                             [('已自动加载第一道错题,作答后答对即移出。', 'dim')])
+        elif not rows:
+            # 错题本空 → 清空答题卡,给出友好提示
+            self.card.q = None
+            for w in self.card.answer_box.winfo_children():
+                w.destroy()
+            set_feedback(self.feedback,
+                         [('🎉 错题本是空的!继续保持,或去「题库练习」刷题。', 'ok')])
 
     def redo(self):
         sel = self.tree.selection()
